@@ -12,12 +12,12 @@ from shutil import rmtree
 from setuptools import setup, find_packages, Command
 
 # Package meta-data.
-NAME = "django-db-multitenant"
-MODULE_NAME = "db_multitenant"
-DESCRIPTION = "Multitenant support for Django, using one tenant per database."
-URL = "https://github.com/mik3y/django-db-multitenant"
-EMAIL = "opensource@hoho.com"
-AUTHOR = "Mike Wakerly"
+NAME = "django-db-multitenant_mongodb"
+MODULE_NAME = "db_multitenant_mongodb"
+DESCRIPTION = "Multitenant support for Django, using one tenant per database with support for mongodb."
+URL = "https://github.com/olubiyiontheweb/django-db-multitenant"
+EMAIL = "olubiyiontheweb@gmail.com"
+AUTHOR = "Mike Wakerly, Oluwatosin Olubiyi"
 
 # What packages are required for this module to be executed?
 REQUIRED = ["Django >= 1.8.0", "djongo"]
@@ -76,7 +76,7 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    keywords="django multitenant",
+    keywords="django multitenant mongodb",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     install_requires=REQUIRED,
     include_package_data=True,
