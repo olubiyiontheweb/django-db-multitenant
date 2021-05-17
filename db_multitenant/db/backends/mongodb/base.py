@@ -7,7 +7,8 @@ from django.core.exceptions import ImproperlyConfigured
 from db_multitenant.threadlocal import MultiTenantThreadlocal
 from db_multitenant.utils import update_database_from_env
 
-WRAPPED_BACKEND = import_module("djongo.base")
+# WRAPPED_BACKEND = import_module("djongo.base")
+from djongo import base as WRAPPED_BACKEND
 
 LOGGER = logging.getLogger("db_multitenant")
 
@@ -30,7 +31,7 @@ class DatabaseWrapper(WRAPPED_BACKEND.DatabaseWrapper):
 
         db_name = self.threadlocal.get_db_name()
         if not db_name:
-            # Django loads the settings after it tries to connect to mongo, when
+            # Django loads the settings after it tries to connect to mysql, when
             # running management commands If that's the case, update database
             # name manually
             update_database_from_env(
