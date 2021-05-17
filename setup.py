@@ -12,10 +12,10 @@ from shutil import rmtree
 from setuptools import setup, find_packages, Command
 
 # Package meta-data.
-NAME = "django-db-multitenant_mongodb"
+NAME = "django-db-multitenant-mongodb"
 MODULE_NAME = "db_multitenant_mongodb"
 DESCRIPTION = "Multitenant support for Django, using one tenant per database with support for mongodb."
-URL = "https://github.com/olubiyiontheweb/django-db-multitenant"
+URL = "https://github.com/olubiyiontheweb/django-db-multitenant-mongodb"
 EMAIL = "olubiyiontheweb@gmail.com"
 AUTHOR = "Mike Wakerly, Oluwatosin Olubiyi"
 

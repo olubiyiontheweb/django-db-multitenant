@@ -2,7 +2,7 @@ django-db-multitenant
 =====================
 
 Provides a simple multi-tenancy solution for Django based on the concept
-of having a **single tenant per database**.
+of having a **single tenant per database** with support for mongodb.
 
 This application is still experimental, but is being used in production
 by the authors. Contributions and discussion are welcome.
@@ -35,6 +35,10 @@ This application supports two backends, MySQL and PostgreSQL:
   each tenant has its own schema and the connection details are shared via the
   public schema.
 
+- **With Mongodb**, this application implements a variation of the **isolated approach**,
+  each tenant has its **own database**, however their **connection details are
+  shared** (such as password, database user).
+
 django-db-multitenant makes it possible (even easy) to take a Django
 application designed for a single tenant and use it with multiple
 tenants.
@@ -47,11 +51,11 @@ The main technique is as follows:
 #. When a request first arrives, determine desired the tenant from the
    ``request`` object, and save it in thread-local storage.
 #. Later in the request, when a database cursor is accquired, issue an
-   SQL ``USE <tenant database name>`` for the desired tenant with MySQL
+   SQL ``USE <tenant database name>`` for the desired tenant with MySQL/Mongodb
    or ``SET search_path TO <tenant name>`` with PostgreSQL.
 
 Step 1 is accomplished by implementing a `mapper
-class <https://github.com/mik3y/django-db-multitenant/blob/master/db_multitenant/mapper.py>`__.
+class <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/db_multitenant/mapper.py>`__.
 Your mapper takes a request object and returns a database name or tenant
 name, using whatever logic you like (translate hostname, inspect a HTTP
 header, etc). The mapper result is saved in thread-local storage for
@@ -60,8 +64,8 @@ later use.
 Step 2 determines whether the desired database or schema has already
 been selected, and is skipped if so. This is implemented using a thin
 database backend
-wrapper `for MySQL <https://github.com/mik3y/django-db-multitenant/blob/master/db_multitenant/db/backends/mysql/base.py>`__ and
-`for PostgreSQL <https://github.com/mik3y/django-db-multitenant/blob/master/db_multitenant/db/backends/postgresql/base.py>`__
+wrapper `for MySQL <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/db_multitenant/db/backends/mysql/base.py>`__ and
+`for PostgreSQL <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/db_multitenant/db/backends/postgresql/base.py>`__
 which must be set in ``settings.DATABASES`` as the backend.
 
 Usage
@@ -70,31 +74,31 @@ Usage
 1. Install
 ~~~~~~~~~~
 
-Install ``django-db-multitenant`` (or add it to your setup.py).
+Install ``django-db-multitenant-mongodb`` (or add it to your setup.py).
 
 ::
 
-    $ pip install django-db-multitenant
+    $ pip install django-db-multitenant-mongodb
 
 2. Implement a mapper
 ~~~~~~~~~~~~~~~~~~~~~
 
 You must implement a subclass of
-`db_multitenant.mapper <https://github.com/mik3y/django-db-multitenant/blob/master/db_multitenant/mapper.py>`__
+`db_multitenant.mapper <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/db_multitenant/mapper.py>`__
 which determines the database name and cache prefix from the request.
 
 To help you to write your mapper, the repository contains examples of mappers which extracts the hostname
 of URL to determine the tenant name (eg. in `https://foo.example.com/bar/`, `foo` will be the tenant name):
 
--  `mapper for MySQL <https://github.com/mik3y/django-db-multitenant/blob/master/mapper_examples/mysql_hostname_tenant_mapper.py>`__,
+-  `mapper for MySQL <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/mapper_examples/mysql_hostname_tenant_mapper.py>`__,
    which uses a portion of the hostname directly as the database name.
 
--  `mapper for PostgreSQL <https://github.com/mik3y/django-db-multitenant/blob/master/mapper_examples/postgresql_hostname_tenant_mapper.py>`__,
+-  `mapper for PostgreSQL <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/mapper_examples/postgresql_hostname_tenant_mapper.py>`__,
    which uses a portion of the hostname as search path (schema). PostgreSQL
    allows complex setups with sharing of common tables (public accounts for example),
    see the comment in the mapper for more details.
 
--  `mapper for Redis <https://github.com/mik3y/django-db-multitenant/blob/master/mapper_examples/redis_hostname_tenant_mapper.py>`__,
+-  `mapper for Redis <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/mapper_examples/redis_hostname_tenant_mapper.py>`__,
    which looks up the tenant using the hostname, throwing a 404 if unrecognized.
 
 Feel free to copy an example mapper in your project then adjust it to your needs.
@@ -145,6 +149,17 @@ Or for PostgreSQL:
         }
     }
 
+Or for Mongodb:
+
+.. code:: python
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'db_multitenant.db.backends.mongodb',
+            'NAME': 'mydb',
+        }
+    }
+
 Optionally, add the multitenant helper ``KEY_FUNCTION`` to your cache
 definition, which will cause cache keys to be prefixed with the value of
 ``mapper.get_cache_prefix``:
@@ -163,7 +178,7 @@ definition, which will cause cache keys to be prefixed with the value of
 ~~~~~~~~
 
 If the tenant name of your application is extracted from the URL (as in the provided examples of
-`mappers <https://github.com/mik3y/django-db-multitenant/blob/master/mapper_examples>`__), you can add
+`mappers <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/mapper_examples>`__), you can add
 a host to your ``/etc/hosts`` such as ``foo.example.com`` to redirect to your localhost server.
 
 You should add ``foo.example.com`` to ``ALLOWED_HOSTS`` list in your Django settings and just try
@@ -235,7 +250,7 @@ License
 -------
 
 The project is distributed under the
-`3-clause BSD license <https://github.com/mik3y/django-db-multitenant/blob/master/LICENSE>`__.
+`3-clause BSD license <https://github.com/olubiyiontheweb/django-db-multitenant-mongodb/blob/master/LICENSE>`__.
 
 Alternatives and Further Reading
 --------------------------------
